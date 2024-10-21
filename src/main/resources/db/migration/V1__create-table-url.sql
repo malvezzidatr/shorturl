@@ -1,0 +1,8 @@
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+CREATE TABLE url (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    originalUrl TEXT NOT NULL,
+    shortUrl TEXT NOT NULL,
+    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
