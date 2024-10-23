@@ -5,4 +5,5 @@ import com.shorturl.shorturl.dto.Url;
 
 public interface UrlRepository extends JpaRepository<Url, UUID> {
     Url findByShortenUrl(String shortenUrl);
+    Url findByAlias(String alias);
 }

@@ -28,6 +28,10 @@ public class UrlServiceImpl implements UrlService {
     public ResponseUrlDTO shortenUrl(RequestUrlDTO url) throws URISyntaxException {
         try {
             logger.info("Start - UrlServiceImpl - shortenUrl - url: {}", url.getUrl());
+            if (isAliasExists(url.getAlias())) {
+                logger.info("End - UrlServiceImpl - method: shortenUrl - alias already exists - url: {}, alias: {}", url.getUrl(), url.getAlias());
+                throw new IllegalArgumentException("Alias already in use");
+            }
             String domain = extractDomain(url.getUrl());
             String shortUrl = createShortUrl(domain, url.getAlias());
             ResponseUrlDTO responseUrlDTO = ResponseUrlDTO.builder()
@@ -42,10 +46,32 @@ public class UrlServiceImpl implements UrlService {
                 .create_at(new Date())
                 .build();
             urlRepository.save(dbUrl);
-            logger.info("End - UrlServiceImpl - shortenUrl - url: {}, shortUrl: {}", url.getUrl(), shortUrl);
+            logger.info("End - UrlServiceImpl - method: shortenUrl - url: {}, shortenUrl: {}", url.getUrl(), shortUrl);
             return responseUrlDTO;
         } catch (Exception e) {
-            logger.error("Error - UrlServiceImpl - shortenUrl - url: {}", url.getUrl(), e);
+            logger.error("Error - UrlServiceImpl - method: shortenUrl - url: {}", url.getUrl(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    public ResponseUrlDTO getShortenUrl(String shortUrl) {
+        try {
+            logger.info("Start - UrlServiceImpl - method: getShortenUrl - shortUrl: {}", shortUrl);
+            Url dbUrl = urlRepository.findByShortenUrl(shortUrl);
+            if (dbUrl == null) {
+                logger.info("End - UrlServiceImpl - method: getShortenUrl - shorten url is not found - shortUrl: {}", shortUrl);
+                throw new IllegalArgumentException("This shorten url is not found");
+
+            }
+            ResponseUrlDTO responseUrlDTO = ResponseUrlDTO.builder()
+                                                .originalUrl(dbUrl.getOriginalUrl())
+                                                .shortenUrl(dbUrl.getShortenUrl())
+                                                .alias(dbUrl.getAlias())
+                                                .build();
+            return responseUrlDTO;
+        } catch (Exception e) {
+            logger.error("Error - UrlServiceImpl - method: getShortenUrl - shortUrl: {}", shortUrl, e);
             throw e;
         }
     }
@@ -64,6 +90,11 @@ public class UrlServiceImpl implements UrlService {
 
     private String createShortUrl(String domain, String alias) {
         return domain + "/" + alias;
+    }
+
+    private Boolean isAliasExists(String alias) {
+        Url urlExists = urlRepository.findByAlias(alias);
+        return urlExists != null;
     }
     
 }

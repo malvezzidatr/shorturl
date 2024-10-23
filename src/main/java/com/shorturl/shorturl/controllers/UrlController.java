@@ -31,15 +31,18 @@ public class UrlController {
 
     @PostMapping("/shorten")
     public ResponseEntity<ResponseUrlDTO> shortenUrl(@RequestBody RequestUrlDTO url) throws URISyntaxException {
-        logger.info("Start - UrlController - shortenUrl - url: {}", url.getUrl());
+        logger.info("Start - UrlController - method: shortenUrl - url: {}", url.getUrl());
         ResponseUrlDTO response = urlService.shortenUrl(url);
-        logger.info("End - UrlController - shortenUrl: {}, originalUrl: {}", response.getShortenUrl(), response.getOriginalUrl());
+        logger.info("End - UrlController - method: shortenUrl - shortenUrl: {}, originalUrl: {}", response.getShortenUrl(), response.getOriginalUrl());
         return ResponseEntity.ok().body(response);
     }
     
     @GetMapping()
-    public String getUrl(@RequestParam String shortUrl) {
-        return shortUrl;
+    public ResponseEntity<ResponseUrlDTO> getShortenUrl(@RequestParam String shortUrl) {
+        logger.info("Start - UrlController - method: getShortenUrl - shortUrl: {}", shortUrl);
+        ResponseUrlDTO response = urlService.getShortenUrl(shortUrl);
+        logger.info("Start - UrlController - method: getShortenUrl - response: {}", response);
+        return ResponseEntity.ok().body(response);
     }
     
 }
