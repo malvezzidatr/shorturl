@@ -3,9 +3,9 @@ package com.shorturl.shorturl.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.shorturl.shorturl.controllers.UrlController;
 import com.shorturl.shorturl.dto.RequestUrlDTO;
 import com.shorturl.shorturl.dto.ResponseUrlDTO;
 import com.shorturl.shorturl.dto.Url;
@@ -55,6 +55,7 @@ public class UrlServiceImpl implements UrlService {
     }
 
     @Override
+    @Cacheable(value = "shortenUrl", key = "#shortUrl")
     public ResponseUrlDTO getShortenUrl(String shortUrl) {
         try {
             logger.info("Start - UrlServiceImpl - method: getShortenUrl - shortUrl: {}", shortUrl);
