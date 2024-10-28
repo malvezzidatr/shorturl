@@ -41,7 +41,7 @@ public class UrlController {
     public ResponseEntity<ResponseUrlDTO> getShortenUrl(@RequestParam String shortUrl) {
         logger.info("Start - UrlController - method: getShortenUrl - shortUrl: {}", shortUrl);
         ResponseUrlDTO response = urlService.getShortenUrl(shortUrl);
-        logger.info("Start - UrlController - method: getShortenUrl - response: {}", response);
+        logger.info("End - UrlController - method: getShortenUrl - response: {}", response);
         return ResponseEntity.ok().body(response);
     }
     
