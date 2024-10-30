@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.shorturl.shorturl.dto.RequestUrlDTO;
 import com.shorturl.shorturl.dto.ResponseUrlDTO;
 import com.shorturl.shorturl.dto.Url;
+import com.shorturl.shorturl.exceptions.UrlNotFoundException;
 import com.shorturl.shorturl.repositories.UrlRepository;
 
 import java.net.URI;
@@ -56,14 +57,13 @@ public class UrlServiceImpl implements UrlService {
 
     @Override
     @Cacheable(value = "shortenUrl", key = "#shortUrl")
-    public ResponseUrlDTO getShortenUrl(String shortUrl) {
+    public ResponseUrlDTO getShortenUrl(String shortUrl) throws UrlNotFoundException {
         try {
             logger.info("Start - UrlServiceImpl - method: getShortenUrl - shortUrl: {}", shortUrl);
             Url dbUrl = urlRepository.findByShortenUrl(shortUrl);
             if (dbUrl == null) {
                 logger.info("End - UrlServiceImpl - method: getShortenUrl - shorten url is not found - shortUrl: {}", shortUrl);
-                throw new IllegalArgumentException("This shorten url is not found");
-
+                throw new UrlNotFoundException("URL_NOT_FOUND", "URL not found", "Teste3");
             }
             ResponseUrlDTO responseUrlDTO = ResponseUrlDTO.builder()
                                                 .originalUrl(dbUrl.getOriginalUrl())
@@ -71,9 +71,9 @@ public class UrlServiceImpl implements UrlService {
                                                 .alias(dbUrl.getAlias())
                                                 .build();
             return responseUrlDTO;
-        } catch (Exception e) {
-            logger.error("Error - UrlServiceImpl - method: getShortenUrl - shortUrl: {}", shortUrl, e);
-            throw e;
+        } catch (UrlNotFoundException ex) {
+            logger.error("Error - UrlServiceImpl - method: getShortenUrl - shortUrl: {}", shortUrl, ex.getMessage());
+            throw ex;
         }
     }
 
