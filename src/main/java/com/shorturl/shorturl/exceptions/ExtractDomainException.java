@@ -3,14 +3,14 @@ package com.shorturl.shorturl.exceptions;
 import lombok.Getter;
 
 @Getter
-public class UrlNotFoundException extends RuntimeException {
-    
+public class ExtractDomainException extends RuntimeException {
+
     private final String errorCode;
     private final String message;
 
-    public UrlNotFoundException(String errorCode, String message) {
+    public ExtractDomainException(String errorCode, String message) {
         this.errorCode = errorCode;
         this.message = message;
     }
-    
+
 }

@@ -3,14 +3,14 @@ package com.shorturl.shorturl.exceptions;
 import lombok.Getter;
 
 @Getter
-public class UrlNotFoundException extends RuntimeException {
+public class AliasAlreadyUsedException extends RuntimeException {
     
     private final String errorCode;
     private final String message;
 
-    public UrlNotFoundException(String errorCode, String message) {
+    public AliasAlreadyUsedException(String errorCode, String message) {
         this.errorCode = errorCode;
         this.message = message;
     }
-    
+
 }

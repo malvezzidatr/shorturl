@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.shorturl.shorturl.dto.RequestUrlDTO;
 import com.shorturl.shorturl.dto.ResponseUrlDTO;
 import com.shorturl.shorturl.dto.Url;
+import com.shorturl.shorturl.exceptions.AliasAlreadyUsedException;
+import com.shorturl.shorturl.exceptions.ExtractDomainException;
 import com.shorturl.shorturl.exceptions.UrlNotFoundException;
 import com.shorturl.shorturl.repositories.UrlRepository;
 
@@ -31,7 +33,7 @@ public class UrlServiceImpl implements UrlService {
             logger.info("Start - UrlServiceImpl - shortenUrl - url: {}", url.getUrl());
             if (isAliasExists(url.getAlias())) {
                 logger.info("End - UrlServiceImpl - method: shortenUrl - alias already exists - url: {}, alias: {}", url.getUrl(), url.getAlias());
-                throw new IllegalArgumentException("Alias already in use");
+                throw new AliasAlreadyUsedException("ALIAS_IN_USE", "Alias already in use");
             }
             String domain = extractDomain(url.getUrl());
             String shortUrl = createShortUrl(domain, url.getAlias());
@@ -49,9 +51,9 @@ public class UrlServiceImpl implements UrlService {
             urlRepository.save(dbUrl);
             logger.info("End - UrlServiceImpl - method: shortenUrl - url: {}, shortenUrl: {}", url.getUrl(), shortUrl);
             return responseUrlDTO;
-        } catch (Exception e) {
-            logger.error("Error - UrlServiceImpl - method: shortenUrl - url: {}", url.getUrl(), e);
-            throw e;
+        } catch (AliasAlreadyUsedException ex) {
+            logger.error("Error - UrlServiceImpl - method: shortenUrl - url: {}", url.getUrl(), ex.getMessage());
+            throw ex;
         }
     }
 
@@ -63,7 +65,7 @@ public class UrlServiceImpl implements UrlService {
             Url dbUrl = urlRepository.findByShortenUrl(shortUrl);
             if (dbUrl == null) {
                 logger.info("End - UrlServiceImpl - method: getShortenUrl - shorten url is not found - shortUrl: {}", shortUrl);
-                throw new UrlNotFoundException("URL_NOT_FOUND", "URL not found", "Teste3");
+                throw new UrlNotFoundException("URL_NOT_FOUND", "URL not found");
             }
             ResponseUrlDTO responseUrlDTO = ResponseUrlDTO.builder()
                                                 .originalUrl(dbUrl.getOriginalUrl())
@@ -84,8 +86,8 @@ public class UrlServiceImpl implements UrlService {
             }
             URI uri = new URI(url);
             return uri.getScheme() + "://" + uri.getHost();
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException("URL inválida: " + url, e);
+        } catch (URISyntaxException ex) {
+            throw new ExtractDomainException("EXTRACT_DOMAIN_ERROR", "Error extracting domain");
         }
     }
 
